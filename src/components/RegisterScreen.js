@@ -93,6 +93,7 @@ form button {
     color: #FFFFFF;
     line-height: 26px;
     margin-bottom: 25px;
+    cursor: pointer;
 }
 
 p {
