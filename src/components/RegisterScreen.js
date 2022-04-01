@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import axios from "axios";
 import Logo from "../images/LogoTrackit.png"
@@ -9,6 +9,8 @@ export default function RegisterScreen() {
     const [senha, setSenha] = useState("");
     const [nome, setNome] = useState("");
     const [foto, setFoto] = useState("");
+
+    const navigate = useNavigate();
 
     function makeRegister(e) {
         e.preventDefault();
@@ -20,6 +22,7 @@ export default function RegisterScreen() {
             name: nome,
             image: foto,
         });
+        promise.then(() => navigate("/"));
         promise.catch(err => console.log (err.status));
     }
     return (
@@ -31,9 +34,8 @@ export default function RegisterScreen() {
                 <input type="text" value={nome} onChange={e => setNome(e.target.value)} placeholder="nome" required />
                 <input type="url" value={foto} onChange={e => setFoto(e.target.value)} placeholder="foto" required />
 
-                <Link to = "/">
-                    <button type="submit">Cadastrar</button>
-                </Link>
+                <button type="submit">Cadastrar</button>
+
             </form>
 
             <Link to = "/">
