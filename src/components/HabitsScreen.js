@@ -6,7 +6,7 @@ import TokenContext from "../contexts/TokenContext";
 import Header from "./Header";
 import Footer from "./Footer";
 import TableDaysWeek from "./TableDaysWeek";
-//import PopUpDelete from "./PopUpDelete";
+import DeleteHabits from "./DeleteHabits";
 import Dump from "../images/Dump.png";
 
 export default function HabitsScreen() {
@@ -95,7 +95,7 @@ export default function HabitsScreen() {
                 callbackLoad={setLoad}
                 /> : " "}
 
-            {popUp && <PopUpDelete
+            {popUp && <DeleteHabits
                 id={popUp}
                 callbackEffect={setCallUseEffect}
                 token={loginData.token}
