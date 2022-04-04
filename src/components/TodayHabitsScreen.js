@@ -5,19 +5,18 @@ import axios from "axios";
 import dayjs from "dayjs";
 import 'dayjs/locale/pt-br';
 import HabitsContext from "../contexts/HabitsContext";
-import TokenContext from "../contexts/TokenContext";
 import Header from "./Header";
 import Footer from "./Footer";
 import CheckMark from "../images/CheckMark.png";
 
 export default function TodayHabitsScreen() {
-    const { loginData } = useContext(TokenContext);
+    const token = localStorage.getItem("token");
     const { habitsPercentage, setHabitsPercentage } = useContext(HabitsContext);
     const [todayHabits, setTodayHabits] = useState([]);
     const [callTodayHabits, setCallTodayHabits] = useState(false);
 
     dayjs.locale('pt-br');
-    const day = require('dayjs/locale/pt-br');
+    require('dayjs/locale/pt-br');
     let now = dayjs();
     let getToday = dayjs(now).locale('pt-br').format('dddd, DD/MM');
     let firstLetter = getToday[0].toUpperCase();
@@ -50,28 +49,23 @@ export default function TodayHabitsScreen() {
         setHabitsPercentage(percentage);
     }
 
-    function checkDoneHabit(id) {
-        const promise = axios.post(`https://mock-api.bootcamp.respondeai.com.br/api/v2/trackit/habits/${id}/check`, "", 
-        {
+    function checkHabit(id, done) {
+        let URL="";
+        
+        const author = {
             headers: {
-                "Authorization": `Bearer ${loginData.token}`
+                "Authorization": `Bearer ${token}`
             }
-        });
-        promise.then(() => {
-            setCallTodayHabits(!callTodayHabits);
-        })
-        promise.catch((err) => {
-            console.log("erro", err.response.status);
-        })
-    }
+        }
+        
+        if(done){
+            URL = `https://mock-api.bootcamp.respondeai.com.br/api/v2/trackit/habits/${id}/uncheck`;
+        }else{
+            URL = `https://mock-api.bootcamp.respondeai.com.br/api/v2/trackit/habits/${id}/check`;
+        }
+        
+        const promise = axios.post(URL, "", author);
 
-    function checkUndoneHabit(id) {
-        const promise = axios.post(`https://mock-api.bootcamp.respondeai.com.br/api/v2/trackit/habits/${id}/uncheck`, "", 
-        {
-            headers: {
-                "Authorization": `Bearer ${loginData.token}`
-            }
-        });
         promise.then(() => {
             setCallTodayHabits(!callTodayHabits);
         })
@@ -86,6 +80,7 @@ export default function TodayHabitsScreen() {
             return <ToDo key={id}>
                 <h6>{name}</h6>
                 
+                <SectionList>
                 <p>Sequência atual: 
                     <SpanCurrent selected={done}>
                         {currentSequence} {currentSequence !== "0" && currentSequence !== "1" ? ' dia' : ' dias'} 
@@ -96,9 +91,10 @@ export default function TodayHabitsScreen() {
                         {highestSequence} {highestSequence !== "0" && highestSequence !== "1" ? ' dia' : ' dias'}
                     </SpanHighest>
                 </p>
+                </SectionList>
 
                 <ThemeProvider theme={done ? selectedTheme : defaultTheme}>
-                    <Checkbox onClick={() => { done ? checkUndoneHabit(id) : checkDoneHabit(id) }}>
+                    <Checkbox onClick={() => checkHabit(id, done)}>
                         <img src={CheckMark} alt="Botão checar" />
                     </Checkbox>
                 </ThemeProvider>
@@ -150,39 +146,42 @@ const Section = styled.section`
     background-color: #E5E5E5;
     overflow-y: scroll;
 
-* {
-    font-family: 'Lexend Deca';
-    font-weight: 400;
-}
-
-h3 {
-    margin-top: 10%;
-    margin-left: 10px;
-    margin-right: 20px;
-    font-size: 18px;
-    color: #666666;
-}`;
+    h3 {
+        margin-top: 10%;
+        margin-left: 10px;
+        margin-right: 20px;
+        font-family: 'Lexend Deca';
+        font-weight: 400;
+        font-size: 18px;
+        color: #666666;
+    }`;
 
 const Container = styled.div`
-    margin-top: 25%;
-    margin-left: 20px;
+    margin-top: 80px;
+    margin-left: 10px;
 
-h1 {
-    font-size: 22.98px;
-    color: #126BA5;
-}
+    h1 {
+        font-family: 'Lexend Deca';
+        font-weight: 400;
+        font-size: 22.98px;
+        color: #126BA5;
+    }
 
-h2 {
-    font-size: 18px;
-    line-height: 22px;
-    color: #BABABA;
-}
+    h2 {
+        font-family: 'Lexend Deca';
+        font-weight: 400;
+        font-size: 18px;
+        line-height: 22px;
+        color: #BABABA;
+    }
 
-p {
-    font-size: 18px;
-    line-height: 22px;
-    color: #8FC549;
-}`;
+    p {
+        font-family: 'Lexend Deca';
+        font-weight: 400;
+        font-size: 18px;
+        line-height: 22px;
+        color: #8FC549;
+    }`;
 
 const HabitsList = styled.div`
     margin-bottom: 30%;
@@ -196,7 +195,6 @@ const ToDo = styled.div`
     background-color: #FFFFFF;
     margin-top: 10px;
     width: 340px;
-    height: 91px;
     border-radius: 5px;
     font-family: 'Lexend Deca';
     font-weight: 400;
@@ -207,48 +205,55 @@ const ToDo = styled.div`
     justify-content: space-evenly;
 
     h6 {
+        margin: 13px;
         margin-left: 15px;
+        margin-right: 85px;
     }
 
     p {
         margin-left: 15px;
         font-size: 13px;
+        line-height: 16px;
     }`;
 
-    const Checkbox = styled.div`
-        position: absolute;
-        right: 10ox;
-        bottom: 10px;
-        width: 69px;
-        height: 69px;
-        border-radius: 5px;
-        background-color: ${props => props.theme.dfColor};
-        border: 1px solid #D4D4D4;
-        text-align: center;
-        line-height: 87px;
-        cursor: pointer;
+const SectionList = styled.div`
+    margin-bottom: 13px;
+    `;
+
+const Checkbox = styled.div`
+    position: absolute;
+    right: 10ox;
+    bottom: 10px;
+    width: 69px;
+    height: 69px;
+    border-radius: 5px;
+    background-color: ${props => props.theme.dfColor};
+    border: 1px solid #D4D4D4;
+    text-align: center;
+    line-height: 87px;
+    cursor: pointer;
 
     img {
         width: 32px;
         height: 35px;
     }`;
 
-    const defaultTheme = {
-        dfColor: '#EBEBEB'
-    };
+const defaultTheme = {
+    dfColor: '#EBEBEB'
+};
 
-    const selectedTheme = {
-        dfColor: '#8FC549'
-    };
+const selectedTheme = {
+    dfColor: '#8FC549'
+};
 
-    const defaultDayColor = {
-        dfColor: '#666666'
-    };
+const defaultDayColor = {
+    dfColor: '#666666'
+};
 
-    const SpanHighest = styled.span`
-        color: ${(props) => highestDayColor(props.currentSeq, props.highestSeq)}
-    `;
+const SpanHighest = styled.span`
+    color: ${(props) => highestDayColor(props.currentSeq, props.highestSeq)}
+`;
 
-    const SpanCurrent = styled.span`
-        color: ${(selected) => currentDaysColor(selected)}
-    `;
+const SpanCurrent = styled.span`
+    color: ${(selected) => currentDaysColor(selected)}
+`;

@@ -23,9 +23,12 @@ export default function RegisterScreen() {
             name: userData.name,
             image: userData.image
         });
-        promise.then(() => navigate("/"));
+        promise.then(response => {
+            navigate("/");
+        });
+
         promise.catch((err) => {
-            console.log (err.status)
+            console.log (err.response.status);
             alert("Usuário não cadastrado.");
             setLoad(false);
             setUserData({ email: "", password: "", name: "", image: "" });
@@ -45,7 +48,7 @@ export default function RegisterScreen() {
 
             </form>
 
-            <Link to = "/">
+            <Link to={"/"}>
                 <p>Já tem uma conta? Faça login!</p>
             </Link>
         </Main>
@@ -62,15 +65,10 @@ const Main = styled.main`
 img {
     width: 180px;
     height: 178.38px;
-    margin-bottom: 32.62px;
-}
-
-* {
-    font-family: 'Lexend Deca';
-    font-weight: 400;
 }
 
 form {
+    margin-top: 5vh;
     display: flex;
     flex-direction: column;
 }
@@ -84,10 +82,16 @@ input {
     background-color: #FFFFFF;
     left: 36px;
     top: 279px;
-    margin-bottom: 6px;
+    margin-bottom: 1vh;
+    font-weight: 400;
+    font-size: 20px;
+    line-height: 25px;
+    color: #666666;
 }
 
 input::placeholder {
+    font-family: 'Lexend Deca';
+    font-weight: 400;
     font-size: 19.98px;
     color: #DBDBDB;
 }
@@ -99,15 +103,19 @@ button {
     border-radius: 4.64px;
     font-size: 20.98px;
     color: #FFFFFF;
+    font-family: 'Lexend Deca';
+    font-weight: 400;
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-bottom: 25px;
 }
 
 p {
+    font-family: 'Lexend Deca';
+    font-weight: 400;
     font-size: 13.98px;
     color: #52B6FF;
     line-height: 17px;
+    margin-top: 25px;
     text-decoration-line: underline;
 }`

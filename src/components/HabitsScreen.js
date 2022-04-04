@@ -1,8 +1,7 @@
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { ThemeProvider } from "styled-components";
 import styled from "styled-components";
 import axios from "axios";
-import TokenContext from "../contexts/TokenContext";
 import Header from "./Header";
 import Footer from "./Footer";
 import TableDaysWeek from "./TableDaysWeek";
@@ -10,13 +9,13 @@ import DeleteHabits from "./DeleteHabits";
 import Dump from "../images/Dump.png";
 
 export default function HabitsScreen() {
-    const { loginData } = useContext(TokenContext);
+    const token = localStorage.getItem("token");
     const [habitsTable, setHabitsTable] = useState(false);
     const [renderHabits, setRenderHabits] = useState([]);
     const [newHabit, setNewHabit] = useState({ name: '', days: new Map()});
     const [load, setLoad] = useState(false);
     const [callUseEffect, setCallUseEffect] = useState(false);
-    const [popUp, setPopUp] = useState("");
+    const [turnOff, setTurnOff] = useState("");
 
     useEffect(() => {
         const promise = axios.get("https://mock-api.bootcamp.respondeai.com.br/api/v2/trackit/habits", 
@@ -37,10 +36,20 @@ export default function HabitsScreen() {
     }, [callUseEffect])
 
     function askDeleteHabit(id) {
-        setPopUp(id);
+        setTurnOff(id);
     }
 
     function showHabitsList() {
+        const weekDays = [
+            { letter: 'D', number: 0 },
+            { letter: 'S', number: 1 },
+            { letter: 'T', number: 2 },
+            { letter: 'Q', number: 3 },
+            { letter: 'Q', number: 4 },
+            { letter: 'S', number: 5 },
+            { letter: 'S', number: 6 },
+        ];
+        
         return renderHabits.map((habit) => {
             const { id, name, days } = habit;
             return <HabitContainer key={id}>
@@ -50,27 +59,11 @@ export default function HabitsScreen() {
                 </button>
 
                 <section>
-                    <ThemeProvider theme={days.includes(7) ? invertedColor : color}>
-                        <Day>D</Day>
-                    </ThemeProvider>
-                    <ThemeProvider theme={days.includes(1) ? invertedColor : color}>
-                        <Day>S</Day>
-                    </ThemeProvider>
-                    <ThemeProvider theme={days.includes(2) ? invertedColor : color}>
-                        <Day>T</Day>
-                    </ThemeProvider>
-                    <ThemeProvider theme={days.includes(3) ? invertedColor : color}>
-                        <Day>Q</Day>
-                    </ThemeProvider>
-                    <ThemeProvider theme={days.includes(4) ? invertedColor : color}>
-                        <Day>Q</Day>
-                    </ThemeProvider>
-                    <ThemeProvider theme={days.includes(5) ? invertedColor : color}>
-                        <Day>S</Day>
-                    </ThemeProvider>
-                    <ThemeProvider theme={days.includes(6) ? invertedColor : color}>
-                        <Day>S</Day>
-                    </ThemeProvider>
+                    {weekDays.map((day, index) => {
+                        return <ThemeProvider theme={days.includes(day.number) ? invertedColor : color} key={index}>
+                            <Day>{day.letter}</Day>
+                        </ThemeProvider>;
+                    })}
                 </section>
             </HabitContainer>
         })
@@ -86,26 +79,28 @@ export default function HabitsScreen() {
                 <button onClick={() => setHabitsTable(!habitsTable)}>+</button>
             </Container>
 
-            {habitsTable ? <TableDaysWeek habit={newHabit} 
-                token={loginData.token} 
-                callback={setNewHabit} 
-                callbackEffect={setCallUseEffect} 
+            <Main>
+            {habitsTable ? <TableDaysWeek 
+                habit={newHabit}
+                token={token}
+                callback={setNewHabit}
+                callbackEffect={setCallUseEffect}
                 callbackTable={setHabitsTable}
                 load={load}
                 callbackLoad={setLoad}
-                /> : " "}
+            /> : " "}
 
-            {popUp && <DeleteHabits
-                id={popUp}
-                callbackEffect={setCallUseEffect}
-                token={loginData.token}
-                callbackPopUp={setPopUp}
-                />}
+            {turnOff && <DeleteHabits 
+                id={turnOff} 
+                callbackEffect={setCallUseEffect} 
+                token={token}
+                callbackPopUp = {setTurnOff} />}
 
-            <HabitList>
-                {renderHabits.length > 0 ? showTotalHabits : 
-                <p>Você não tem nenhum hábito cadastrado ainda. Adicione um hábito para começar a trackear!</p>}
-            </HabitList>
+            {renderHabits.length > 0 ? showTotalHabits
+                : <p>Você não tem nenhum hábito cadastrado ainda.
+                    Adicione um hábito para começar a trackear!</p>}
+            </Main>
+
             <Footer />
         </Section>
     )
@@ -115,9 +110,6 @@ const Section = styled.section`
     background-color: #E5E5E5;
     height: 100vh;
     overflow-y: scroll;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
 
     p {
     margin-top: 10%;
@@ -130,14 +122,14 @@ const Section = styled.section`
     }`;
 
 const Container = styled.div`
-    margin-top: 25%;
+    margin-top: 80px;
     margin-left: 10px;
     margin-right: 10px;
     display: flex;
     align-items: center;
+    justify-content: space-between;
 
     h1 {
-    margin-right: 150px;
     font-family: 'Lexend Deca';
     font-weight: 400;
     font-size: 22.98px;
@@ -149,11 +141,19 @@ const Container = styled.div`
     height: 35px;
     color: #FFFFFF;
     border: none;
-    background-color: #52B6FF;
-    border-radius: 4.64;
+    background: #52B6FF;
+    border-radius: 5px;
+    margin-right: 15px;
+    font-family: 'Lexend Deca';
+    font-weight: 400;
+    font-size: 27px;
+    line-height: 5px;
     }`;
 
-const HabitList = styled.div`
+const Main = styled.main`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     margin-bottom: 30%;
     `;
 
@@ -162,7 +162,6 @@ const HabitContainer = styled.div`
     background-color: #FFFFFF;
     margin-top: 10px;
     width: 340px;
-    height: 91px;
     border-radius: 5px;
     font-family: 'Lexend Deca';
     font-weight: 400;
@@ -186,11 +185,13 @@ const HabitContainer = styled.div`
     }
 
     h1 {
+        margin: 10px;
         margin-left: 15px;
+        margin-right: 30px;
     }
 
     section {
-        margin-left: 15px;
+        margin: 10px 15px;
     }`;
 
     const Day = styled.div`

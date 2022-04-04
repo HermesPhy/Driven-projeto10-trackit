@@ -5,6 +5,15 @@ import styled from "styled-components";
 export default function TableDaysWeek() {
     const { habit, token, callback, callbackEffect, callbackTable, load, callbackLoad } = props;
     const { name, days } = habit;
+    const weekDays = [
+        { name: 'domingo', letter:'D', number: 0 },
+        { name: 'segunda', letter:'S', number: 1 },
+        { name: 'terca', letter:'T', number: 2 },
+        { name: 'quarta', letter:'Q', number: 3 },
+        { name: 'quinta', letter:'Q', number: 4 },
+        { name: 'sexta', letter:'S', number: 5 },
+        { name: 'sabado', letter:'S', number: 6 }
+    ];
 
     function markOffTable() {
         callbackTable(false);
@@ -36,6 +45,7 @@ export default function TableDaysWeek() {
             console.log(err.response.status);
             callbackLoad(false);
             alert(`Não foi possível processar o hábito. ${err.response.status}`);
+            callback({ name: "", days: [] });
         })
         } else {
             alert("Escolha quais dias da semana você quer executar esse hábito.");
@@ -58,25 +68,17 @@ export default function TableDaysWeek() {
         <Form>
             <form onSubmit={forwardHabit}>
                 <section>
-                    <label htmlFor="name"></label>
                     <input required value={name} type="text" id="name" placeholder="Nome do hábito" onInput={e => callback({...habit, name: e.target.value})} disabled={load} />
 
-                    <div>
-                        <input value={days} type="checkbox" id="domingo" onInput={() => getDay("domingo", 7)} disabled={load} />
-                        <label htmlFor="domingo">D</label>
-                        <input value={days} type="checkbox" id="segunda" onInput={() => getDay("segunda", 1)} disabled={load} />
-                        <label htmlFor="segunda">S</label>
-                        <input value={days} type="checkbox" id="terca" onInput={() => getDay("terca", 2)} disabled={load} />
-                        <label htmlFor="terca">T</label>
-                        <input value={days} type="checkbox" id="quarta" onInput={() => getDay("quarta", 3)} disabled={load} />
-                        <label htmlFor="quarta">Q</label>
-                        <input value={days} type="checkbox" id="quinta" onInput={() => getDay("quinta", 4)} disabled={load} />
-                        <label htmlFor="quinta">Q</label>
-                        <input value={days} type="checkbox" id="sexta" onInput={() => getDay("sexta", 5)} disabled={load} />
-                        <label htmlFor="sexta">S</label>
-                        <input value={days} type="checkbox" id="sabado" onInput={() => getDay("sabado", 7)} disabled={load} />
-                        <label htmlFor="sabado">S</label>
-                    </div>
+                    <article>
+                        {weekDays.map((day, index) => {
+                            return <div>
+                                <input value={days} type="checkbox" id={day.name} key={index} 
+                                    onInput={() => getDay(day.name, day.number)} disabled={load} />
+                                <label htmlFor={day.name} >{day.letter}</label>
+                            </div>
+                        })}            
+                    </article>
 
                 </section>
                 <Options>
@@ -108,6 +110,10 @@ const Form = styled.form`
         height: 45px;
         border-radius: 5px;
         border: 1px solid #D4D4D4;
+        font-weight: 400;
+        font-size: 20px;
+        line-height: 25px;
+        color: #666666;
     }
 
     input[type=text]::placeholder {
@@ -116,11 +122,14 @@ const Form = styled.form`
         color: #D4D4D4;
     }
 
-    div input {
+    article {
+        display: flex;
+    }
+    article div input {
         display: none!important;
     }
 
-    div input[type=checkbox] + label {
+    article div input[type=checkbox] + label {
         width: 30px;
         height: 30px;
         margin-top: 8px;
@@ -135,7 +144,7 @@ const Form = styled.form`
         line-height: 30px;
     }
 
-    div input[type=checkbox]:checked + label {
+    article div input[type=checkbox]:checked + label {
         background-color: #CFCFCF;
         color: #FFFFFF;
     }`;

@@ -32,7 +32,7 @@ export default function Footer() {
 
 const TopBottom = styled.div`
     width: 100%;
-    height: 70%;
+    height: 70px;
     background-color: #FFFFFF;
     position: relative;
     position: fixed;

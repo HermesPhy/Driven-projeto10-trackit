@@ -1,17 +1,21 @@
-import { useContext, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ThreeDots } from "react-loader-spinner";
 import styled from "styled-components";
 import axios from "axios";
 import Logo from "../images/LogoTrackit.png"
-import TokenContext from "./../contexts/TokenContext";
 
 export default function LoginScreen() {
-    const { loginData, setLoginData } = useContext(TokenContext);
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        if(localStorage.getItem("token")){
+            navigate("/hoje");
+        }
+    })
+
     const [userLogin, setUserLogin] = useState({email:"", password:""});
     const [load, setLoad] = useState(false);
-    
-    const navigate = useNavigate();
 
     function makeLogin(e) {
         e.preventDefault();
@@ -24,8 +28,9 @@ export default function LoginScreen() {
         });
         promise.then((response) => {
             const { data } = response;
-            setLoginData({image: data.image, token: data.token});
-            navigate("/hoje");
+            localStorage.setItem("token", data.token);
+            localStorage.setItem("image", data.image);
+            navigate("/hoje"); 
         });
         promise.catch((err) => {
             console.log (err.status)
@@ -46,7 +51,7 @@ export default function LoginScreen() {
                 </button>
             </form>
 
-            <Link to = "/cadastro">
+            <Link to={"/cadastro"}>
                 <p>Não tem uma conta? Cadastre-se!</p>
             </Link>
         </Main>
@@ -62,15 +67,10 @@ const Main = styled.main`
 img {
     width: 180px;
     height: 178.38px;
-    margin-bottom: 32.62px;
-}
-
-* {
-    font-family: 'Lexend Deca';
-    font-weight: 400;
 }
 
 form {
+    margin-top: 15vh;
     display: flex;
     flex-direction: column;
 }
@@ -82,33 +82,42 @@ input {
     box-sizing: border-box;
     border-radius: 5px;
     background-color: #FFFFFF;
-    margin-bottom: 6px;
+    margin-bottom: 2%;
     left: 36px;
     top: 279px;
+    font-weight: 400;
+    font-size: 20px;
+    line-height: 25px;
+    color: #666666;
 }
  
 input::placeholder {
+    font-family: 'Lexend Deca';
+    font-weight: 400;
     font-size: 19.98px;
     color: #DBDBDB;
 }
 
 button {
-    width: 303px;
     height: 45px;
     background-color: #52B6FF;
     border: none;
     border-radius: 4.64px;
+    font-family: 'Lexend Deca';
+    font-weight: 400;
     font-size: 20.98px;
     color: #FFFFFF;
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-bottom: 25px;
 }
 
 p {
+    font-family: 'Lexend Deca';
+    font-weight: 400;
     font-size: 13.98px;
     color: #52B6FF;
     line-height: 17px;
+    margin-top: 25px;
     text-decoration-line: underline;
 }`
