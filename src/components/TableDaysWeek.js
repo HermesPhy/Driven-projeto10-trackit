@@ -2,7 +2,7 @@ import { ThreeDots } from "react-loader-spinner";
 import axios from "axios";
 import styled from "styled-components";
 
-export default function TableDaysWeek() {
+export default function TableDaysWeek(props) {
     const { habit, token, callback, callbackEffect, callbackTable, load, callbackLoad } = props;
     const { name, days } = habit;
     const weekDays = [

@@ -27,7 +27,7 @@ export default function TodayHabitsScreen() {
         const promise = axios.get("https://mock-api.bootcamp.respondeai.com.br/api/v2/trackit/habits/today", 
         {
         headers: {
-            "Authorization": `Bearer ${loginData.token}`
+            "Authorization": `Bearer ${token}`
             }
         });
         promise.then((response) => {
