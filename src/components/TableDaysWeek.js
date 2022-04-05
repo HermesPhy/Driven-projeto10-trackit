@@ -65,7 +65,7 @@ export default function TableDaysWeek(props) {
     }
 
     return (
-        <Form>
+        <FormBody>
             <form onSubmit={forwardHabit}>
                 <section>
                     <input required value={name} type="text" id="name" placeholder="Nome do hábito" onInput={e => callback({...habit, name: e.target.value})} disabled={load} />
@@ -88,11 +88,11 @@ export default function TableDaysWeek(props) {
                     </button>
                 </Options>
             </form>
-        </Form>
+        </FormBody>
     )
 }
 
-const Form = styled.form`
+const FormBody = styled.div`
     width: 340px;
     height: 180px;
     margin-top: 5%;
