@@ -222,7 +222,7 @@ const SectionList = styled.div`
 
 const Checkbox = styled.div`
     position: absolute;
-    right: 10ox;
+    right: 10px;
     bottom: 10px;
     width: 69px;
     height: 69px;
